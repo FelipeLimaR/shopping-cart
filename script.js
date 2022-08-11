@@ -41,9 +41,9 @@ const createCartItemElement = ({ sku, name, salePrice }) => {
 };
 
 const funcao1 = async () => {
-  const { results } = await fetchProducts('computador')
+  const { results } = await fetchProducts('computador');
   results.forEach((product) => {
-    const {id: sku, title: name, thumbnail: image } = product;
+    const { id: sku, title: name, thumbnail: image } = product;
     const desgraça = createProductItemElement({ sku, name, image });
     console.log(desgraça);
 
@@ -52,13 +52,10 @@ const funcao1 = async () => {
 
     const section1 = document.querySelector('.items');
 
-    section1.appendChild(desgraça)
+    section1.appendChild(desgraça);
     // li1.appendChild(img)
-
   //   // comentado para teste fim
-    
   });  
-}
+};
 
-window.onload = () => { funcao1()}
- 
+window.onload = () => { funcao1(); };
