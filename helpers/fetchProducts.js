@@ -14,7 +14,6 @@ const fetchProducts = async (query) => {
   } catch (error) {
     return error;
   }
-
 };
 
 if (typeof module !== 'undefined') {
