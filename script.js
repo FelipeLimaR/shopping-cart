@@ -1,5 +1,7 @@
 // const { fetchProducts } = require("./helpers/fetchProducts");
 
+// const { fetchItem } = require("./helpers/fetchItem");
+
 const createProductImageElement = (imageSource) => {
   const img = document.createElement('img');
   img.className = 'item__image';
@@ -26,36 +28,40 @@ const createProductItemElement = ({ sku, name, image }) => {
   return section;
 };
 
-// const getSkuFromProductItem = (item) => item.querySelector('span.item__sku').innerText;
+const getSkuFromProductItem = (item) => item.querySelector('span.item__sku').innerText;
 
-// const cartItemClickListener = (event) => {
-//   // coloque seu código aqui
-// };
+const cartItemClickListener = (event) => {
+  // coloque seu código aqui
+  const item = event.target;
+  item.remove(event.target);
+};
 
-// const createCartItemElement = ({ sku, name, salePrice }) => {
-//   const li = document.createElement('li');
-//   li.className = 'cart__item';
-//   li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
-//   li.addEventListener('click', cartItemClickListener);
-//   return li;
-// };
+const createCartItemElement = ({ sku, name, salePrice }) => {
+  const li = document.createElement('li');
+  li.className = 'cart__item';
+  li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
+  li.addEventListener('click', cartItemClickListener);
+  return li;
+};
 
 const funcao1 = async () => {
   const { results } = await fetchProducts('computador');
-  results.forEach((product) => {
+  results.forEach(async (product) => {
     const { id: sku, title: name, thumbnail: image } = product;
-    const desgraça = createProductItemElement({ sku, name, image });
-    console.log(desgraça);
-
-    // console.log(produtos[0]);
-    // comentado para teste 
-
+    const productItem = createProductItemElement({ sku, name, image });
     const section1 = document.querySelector('.items');
+    const bilen = productItem.querySelector('.item__add');
+    console.log(bilen);
+    section1.appendChild(productItem);
 
-    section1.appendChild(desgraça);
-    // li1.appendChild(img)
-  //   // comentado para teste fim
-  });  
+    const bilenRaums = document.querySelector('.cart__items');
+    const { price: salePrice } = await fetchItem(getSkuFromProductItem(productItem));
+    bilen.addEventListener('click', createCartItemElement({ sku, name, salePrice }));
+    bilen.addEventListener('click', async () => {
+      const item1 = createCartItemElement({ sku, name, salePrice });
+      bilenRaums.appendChild(item1);
+    });
+  });
 };
 
 window.onload = () => { funcao1(); };
