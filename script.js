@@ -43,6 +43,7 @@ const createCartItemElement = ({ sku, name, salePrice }) => {
   li.addEventListener('click', cartItemClickListener);
   return li;
 };
+const bilenRaums = document.querySelector('.cart__items');
 
 const funcao1 = async () => {
   const { results } = await fetchProducts('computador');
@@ -54,7 +55,6 @@ const funcao1 = async () => {
     console.log(bilen);
     section1.appendChild(productItem);
 
-    const bilenRaums = document.querySelector('.cart__items');
     const { price: salePrice } = await fetchItem(getSkuFromProductItem(productItem));
     bilen.addEventListener('click', createCartItemElement({ sku, name, salePrice }));
     bilen.addEventListener('click', async () => {
@@ -63,5 +63,14 @@ const funcao1 = async () => {
     });
   });
 };
+
+const getClearBtn = document.querySelector('.empty-cart');
+
+const clearBtn = () => {
+  console.log('olá!');
+  getClearBtn.addEventListener('click', () => { bilenRaums.innerText = ''; });
+};
+
+clearBtn();
 
 window.onload = () => { funcao1(); };
