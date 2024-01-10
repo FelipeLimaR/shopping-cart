@@ -1,10 +1,7 @@
-// const { fetchProducts } = require("./helpers/fetchProducts");
-// const container = document.querySelector('.container');
-const bilenRaums = document.querySelector('.cart__items');
-const getClearBtn = document.querySelector('.empty-cart');
-const section1 = document.querySelector('.items');
+const itemsCart = document.querySelector('.cart__items');
+const clearCartBtn = document.querySelector('.empty-cart');
+const itemSelect = document.querySelector('.items');
 const precoTotal = document.querySelector('.total-price');
-const carregando = document.querySelector('.loading');
 
 const createProductImageElement = (imageSource) => {
   const img = document.createElement('img');
@@ -23,25 +20,25 @@ const createCustomElement = (element, className, innerText) => {
 const createProductItemElement = ({ sku, name, image }) => {
   const section = document.createElement('section');
   section.className = 'item';
-
   section.appendChild(createCustomElement('span', 'item__sku', sku));
   section.appendChild(createCustomElement('span', 'item__title', name));
   section.appendChild(createProductImageElement(image));
-  section.appendChild(createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'));
-
+  section.appendChild(
+    createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'),
+  );
   return section;
 };
 
-const getSkuFromProductItem = (item) => item.querySelector('span.item__sku').innerText;
+const getSkuFromProductItem = (item) =>
+  item.querySelector('span.item__sku').innerText;
 
-const cartItemClickListener = (event) => {
-  // coloque seu código aqui
-  const item = event.target;
-  item.remove(event.target);
-  saveCartItems(bilenRaums.innerHTML);
+const cartItemClickListener = ({ target }) => {
+  target.remove();
+  saveCartItems(itemsCart.innerHTML);
+  precoTotal.innerText = (Number(precoTotal.innerText) - target.id);
   localStorage.setItem('precoTotal', precoTotal.innerText);
-  precoTotal.innerText = 0;
 };
+
 const createCartItemElement = ({ sku, name, salePrice }) => {
   const li = document.createElement('li');
   li.className = 'cart__item';
@@ -50,46 +47,41 @@ const createCartItemElement = ({ sku, name, salePrice }) => {
   return li;
 };
 
-const funcao1 = async () => {
-  const { results } = await fetchProducts('computador');
-  results.forEach(async (product) => {
-    const { id: sku, title: name, thumbnail: image } = product;
+const renderItems = async (items) => {
+  items.forEach(async ({ id: sku, title: name, thumbnail: image }) => {
     const productItem = createProductItemElement({ sku, name, image });
-    
-    const bilen = productItem.querySelector('.item__add');
-    section1.appendChild(productItem);
+    const btn = productItem.querySelector('.item__add');
     const { price: salePrice } = await fetchItem(getSkuFromProductItem(productItem));
-    bilen.addEventListener('click', createCartItemElement({ sku, name, salePrice }));
-    bilen.addEventListener('click', async () => {
-      const item1 = await createCartItemElement({ sku, name, salePrice });
-      bilenRaums.appendChild(item1);
-      saveCartItems(bilenRaums.innerHTML);
-      localStorage.setItem('precoTotal', precoTotal.innerText);
+    
+    itemSelect.appendChild(productItem);
+    btn.addEventListener('click', async () => {
+      const cartProduct = await createCartItemElement({ sku, name, salePrice });
+      cartProduct.id = salePrice;
       precoTotal.innerText = (Number(precoTotal.innerText) + salePrice);
+      localStorage.setItem('precoTotal', precoTotal.innerText);
+      
+      itemsCart.appendChild(cartProduct);
+      saveCartItems(itemsCart.innerHTML);
     });
   });
-  carregando.remove();
 };
 
-const clearBtn = async () => {
-  getClearBtn.addEventListener('click', () => { 
-    bilenRaums.innerText = ''; 
-    saveCartItems(bilenRaums.innerHTML);
-    precoTotal.innerText = 0;
-    localStorage.setItem('precoTotal', precoTotal.innerText);
-  });
-};
+clearCartBtn.addEventListener('click', () => {
+  while (itemsCart.firstChild) itemsCart.firstChild.remove();
+  saveCartItems(itemsCart.innerHTML);
+  precoTotal.innerText = 0;
 
-// consegui destravar os requisitos 8, 9 e 11 com grande ajuda do colega Arthur Debiasi
+  localStorage.setItem('precoTotal', precoTotal.innerText);
+});
+
+itemSelect.appendChild(createCustomElement('p', 'loading', 'carregando...'));
 
 window.onload = async () => {
-  funcao1();
-  clearBtn();
-  bilenRaums.innerHTML = getSavedCartItems();
-  bilenRaums.querySelectorAll('li').forEach((item) => {
-    item.addEventListener('click', cartItemClickListener);
-  });
-
+  const { results } = await fetchProducts('computador');
+  await renderItems(results);
+  document.querySelector('.loading').remove();
+  itemsCart.innerHTML = getSavedCartItems();
   precoTotal.innerHTML = localStorage.getItem('precoTotal');
-  // container.removeChild(carregando);
+  itemsCart.querySelectorAll('.cart__item').forEach((item) =>
+    item.addEventListener('click', cartItemClickListener));
 };

@@ -1,12 +1,12 @@
-const fetchItem = async (ting) => {
-  try {
-    const findenItem = `https://api.mercadolibre.com/items/${ting}`;
-    const res = await fetch(findenItem);
-    const data = await res.json();
-      return data;
-  } catch (error) {
-    return error;
+const fetchItem = async (id) => {
+  if (!id) {
+    throw new Error('You must provide an url');
   }
+
+  const endpoint = `https://api.mercadolibre.com/items/${id}`;
+  const res = await fetch(endpoint);
+  const data = await res.json();
+  return data;
 };
 
 if (typeof module !== 'undefined') {
